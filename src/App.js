@@ -45,7 +45,7 @@ const App = () => {
     setFavourites(newFavouritesList);
     saveToLocalStorage(newFavouritesList);
     }
-    else {alert("already added to favourites");}
+    else {alert("Already in your favourites !!");}
   }
 
   const removeFavouriteMovie = (movie) =>{
