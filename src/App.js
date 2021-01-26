@@ -4,33 +4,71 @@ import './App.css';
 import MovieList from './components/MovieList';
 import MovieListHeading from './components/MovieListHeading';
 import SearchBox from './components/SearchBox';
+import AddFavourites from './components/AddFavourites';
+import RemoveFavourites from './components/RemoveFavourites';
 const App = () => {
   const[movies, setMovies] = useState([]);
   const[searchValue, setSearchValue] = useState('');
+  const[favourites, setFavourites] =useState([]);
 
-    const getMovieRequest = async () => {
-      const url = "http://www.omdbapi.com/?s=jurassic&apikey=8c909aca"
+    const getMovieRequest = async (searchValue) => {
+      const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=8c909aca`;
 
       const response = await fetch(url);
       const responseJson = await response.json();
-      console.log(responseJson);
+
+      if(responseJson.Search){
       setMovies(responseJson.Search);
+      }
     }
 
   useEffect(() => {
-    getMovieRequest();
-  }, []);
+    getMovieRequest(searchValue);
+  }, [searchValue]);
+
+  useEffect(() => {
+    const movieFavourites = JSON.parse(localStorage.getItem('react-movie-app-favourites'));
+    setFavourites(movieFavourites);
+  },[]);
+
+  const saveToLocalStorage = (items) => {
+    localStorage.setItem('react-movie-app-favourites', JSON.stringify(items))
+  }
+
+  const addFavouriteMovie = (movie) =>{
+    const newFavouritesList = [...favourites, movie];
+    setFavourites(newFavouritesList);
+    saveToLocalStorage(newFavouritesList);
+  }
+
+  const removeFavouriteMovie = (movie) =>{
+    const newFavouritesList = favourites.filter((favourite) =>favourite.imdbID !== movie.imdbID);
+    setFavourites(newFavouritesList);
+    saveToLocalStorage(newFavouritesList);
+  }
 
   return (
     <div className='container-fluid movie-app'> 
-      <div className='row'>
+      <div className='row d-flex align-items-center mt-4 mb-4'>
         <MovieListHeading heading="Movies"/>
-        <SearchBox/>
+        <SearchBox searchValue={searchValue} setSearchValue={setSearchValue}/>
       </div>
       <div className='row'>
-        <MovieList movies={movies}/>
+        <MovieList movies={movies} 
+        favouriteComponent={AddFavourites}
+        handleFavourtiesClick={addFavouriteMovie}/>
 
       </div>
+      <div className='row d-flex align-items-center mt-4 mb-4'>
+        <MovieListHeading heading="Favourites"/>
+      </div>
+      <div className='row'>
+        <MovieList movies={favourites} 
+        favouriteComponent={RemoveFavourites}
+        handleFavourtiesClick={removeFavouriteMovie}/>
+
+      </div>
+
     </div>
   );
 }
