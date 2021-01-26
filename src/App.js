@@ -35,10 +35,17 @@ const App = () => {
     localStorage.setItem('react-movie-app-favourites', JSON.stringify(items))
   }
 
-  const addFavouriteMovie = (movie) =>{
+  const addFavouriteMovie = (movie) =>{ 
+    var count=0;
+    for(var i=0; i< favourites.length; i++){
+      if(movie === favourites[i]){count++}
+    }
+    if(count === 0){
     const newFavouritesList = [...favourites, movie];
     setFavourites(newFavouritesList);
     saveToLocalStorage(newFavouritesList);
+    }
+    else {alert("already added to favourites");}
   }
 
   const removeFavouriteMovie = (movie) =>{
